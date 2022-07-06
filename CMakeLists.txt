@@ -28,9 +28,19 @@ if (PATH_TO_LLVM)
   message(STATUS "Searching in: ${search_paths}")
 endif()
 
-find_package(Clang
+# Find LLVM first to pick the version
+find_package(LLVM 13
   REQUIRED CONFIG
   ${search_paths}
+  )
+
+# Now find clang
+set(clang_search_path "${LLVM_DIR}/../lib/cmake/clang")
+
+find_package(Clang
+  REQUIRED CONFIG
+  PATHS "${clang_search_path}"
+  NO_DEFAULT_PATH NO_CMAKE_PATH
   )
 
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")

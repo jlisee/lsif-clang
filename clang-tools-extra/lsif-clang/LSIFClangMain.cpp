@@ -129,8 +129,14 @@ int main(int argc, const char **argv) {
   // sys::PrintStackTraceOnErrorSignal(argv[0]);
   backward::SignalHandling sh;
 
-  CommonOptionsParser OptionsParser(argc, argv, LSIFClangCategory,
-                                    cl::OneOrMore);
+  llvm::Expected<CommonOptionsParser> OptionsParser =
+    CommonOptionsParser::create(argc, argv, LSIFClangCategory,
+                                cl::OneOrMore);
+
+  if (!OptionsParser) {
+    llvm::WithColor::error() << llvm::toString(OptionsParser.takeError());
+    return 1;
+  }
 
   std::string ProjectRoot = ProjectRootArg;
   if (ProjectRoot == "") {
@@ -144,13 +150,13 @@ int main(int argc, const char **argv) {
   }
 
   ArgumentsAdjuster Adjuster = combineAdjusters(
-      OptionsParser.getArgumentsAdjuster(),
+      OptionsParser->getArgumentsAdjuster(),
       getInsertArgumentAdjuster("-Wno-unknown-warning-option"));
 
   // Collect symbols found in each translation unit, merging as we go.
   clang::clangd::IndexFileIn Data;
 
-  auto &Compilations = OptionsParser.getCompilations();
+  auto &Compilations = OptionsParser->getCompilations();
   if (Compilations.getAllFiles().size() == 0) {
     exit(1);
   }

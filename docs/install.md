@@ -1,11 +1,13 @@
 # Prerequisites
 
-This project depends on LLVM and Clang. lsif-clang itself should be built against LLVM and Clang version 11, and can index any code Clang 11 can compile.
+This project depends on LLVM and Clang. lsif-clang itself should be built against LLVM and Clang version 13, and can index any code Clang 13 can compile.
 
 ### Ubuntu (20.04)
 
+TODO: for LLVM 13 probably need to install the external repository.
+
 ```sh
-apt install llvm-11 llvm-11-dev clang-11 libclang-11-dev cmake binutils-dev libdwarf-dev libelf-dev
+apt install llvm-13 llvm-13-dev clang-13 libclang-13-dev cmake binutils-dev libdwarf-dev libelf-dev
 ```
 
 #### Older versions of Ubuntu
@@ -19,10 +21,10 @@ don't exist in the `apt` package repository.
 ### MacOS
 
 ```sh
-brew install cmake sourcegraph/brew/llvm@11 binutils
+brew install cmake sourcegraph/brew/llvm@13 binutils
 ```
 
-> Note: lsif-clang must currently be built using LLVM 11
+> Note: lsif-clang must currently be built using LLVM 13
 
 # Installation
 
@@ -46,7 +48,7 @@ sudo make -C build install
 
 Immediately after installing, you should run `lsif-clang`. If you encounter an error like "libLLVM.dylib cannot be opened because the developer cannot be verified", open **System Preferences > Security & Privacy > General** and click **Open Anyway** next to the message "libLLVM.dylib was blocked from use because it is not from an identified developer". Run `lsif-clang` again and click the **Open** button in the system dialog that pops up.
 
-If you did not install LLVM 11 with Homebrew, you may need to modify the values of `Clang_DIR` and
+If you did not install LLVM 13 with Homebrew, you may need to modify the values of `Clang_DIR` and
 `-DPATH_TO_LLVM`. If you encounter the following error:
 
 ```

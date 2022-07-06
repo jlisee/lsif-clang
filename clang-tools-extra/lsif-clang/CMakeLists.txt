@@ -28,6 +28,7 @@ add_library(clangDaemonMinimal
 
   ../clangd/support/Context.cpp
   ../clangd/support/Logger.cpp
+  ../clangd/support/MemoryTree.cpp
   ../clangd/support/Trace.cpp
   ../clangd/support/ThreadsafeFS.cpp
 
@@ -120,7 +121,7 @@ set(CLANG_DAEMON_LIBS
   ${ALL_CLANG_TIDY_CHECKS}
   m
 )
-  
+
 
 if (LLVM IN_LIST LLVM_AVAILABLE_LIBS)
   target_link_libraries(clangDaemonMinimal

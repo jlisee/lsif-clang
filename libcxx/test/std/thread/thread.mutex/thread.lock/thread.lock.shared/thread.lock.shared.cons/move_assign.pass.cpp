@@ -8,7 +8,9 @@
 //
 // UNSUPPORTED: libcpp-has-no-threads
 // UNSUPPORTED: c++03, c++11
-// XFAIL: dylib-has-no-shared_mutex
+
+// dylib support for shared_mutex was added in macosx10.12
+// XFAIL: use_system_cxx_lib && target={{.+}}-apple-macosx10.{{9|10|11}}
 
 // <shared_mutex>
 

@@ -101,6 +101,8 @@
 # define TEST_STD_VER 14
 #elif __cplusplus <= 201703L
 # define TEST_STD_VER 17
+#elif __cplusplus <= 202002L
+# define TEST_STD_VER 20
 #else
 # define TEST_STD_VER 99    // greater than current standard
 // This is deliberately different than _LIBCPP_STD_VER to discourage matching them up.
@@ -137,7 +139,7 @@
 # define TEST_NOEXCEPT_COND(...)
 #endif
 
-#if TEST_STD_VER >= 17
+#if TEST_STD_VER >= 11
 # define TEST_THROW_SPEC(...)
 #else
 # define TEST_THROW_SPEC(...) throw(__VA_ARGS__)
@@ -161,52 +163,6 @@
 # define TEST_CONSTEXPR_CXX20
 #endif
 
-// Sniff out to see if the underlying C library has C11 features
-// Note that at this time (July 2018), MacOS X and iOS do NOT.
-// This is cribbed from __config; but lives here as well because we can't assume libc++
-#if __ISO_C_VISIBLE >= 2011 || TEST_STD_VER >= 11
-#  if defined(__FreeBSD__)
-//  Specifically, FreeBSD does NOT have timespec_get, even though they have all
-//  the rest of C11 - this is PR#38495
-#    define TEST_HAS_ALIGNED_ALLOC
-#    define TEST_HAS_C11_FEATURES
-#  elif defined(__BIONIC__)
-#    define TEST_HAS_C11_FEATURES
-#    if __ANDROID_API__ >= 28
-#      define TEST_HAS_ALIGNED_ALLOC
-#    endif
-#    if __ANDROID_API__ >= 29
-#      define TEST_HAS_TIMESPEC_GET
-#    endif
-#  elif defined(__Fuchsia__) || defined(__wasi__) || defined(__NetBSD__)
-#    define TEST_HAS_ALIGNED_ALLOC
-#    define TEST_HAS_C11_FEATURES
-#    define TEST_HAS_TIMESPEC_GET
-#  elif defined(__linux__)
-// This block preserves the old behavior used by include/__config:
-// _LIBCPP_GLIBC_PREREQ would be defined to 0 if __GLIBC_PREREQ was not
-// available. The configuration here may be too vague though, as Bionic, uClibc,
-// newlib, etc may all support these features but need to be configured.
-#    if defined(TEST_GLIBC_PREREQ)
-#      if TEST_GLIBC_PREREQ(2, 17)
-#        define TEST_HAS_ALIGNED_ALLOC
-#        define TEST_HAS_TIMESPEC_GET
-#        define TEST_HAS_C11_FEATURES
-#      endif
-#    elif defined(_LIBCPP_HAS_MUSL_LIBC)
-#      define TEST_HAS_ALIGNED_ALLOC
-#      define TEST_HAS_C11_FEATURES
-#      define TEST_HAS_TIMESPEC_GET
-#    endif
-#  elif defined(_WIN32)
-#    if defined(_MSC_VER) && !defined(__MINGW32__)
-#      define TEST_HAS_ALIGNED_ALLOC
-#      define TEST_HAS_C11_FEATURES // Using Microsoft's C Runtime library
-#      define TEST_HAS_TIMESPEC_GET
-#    endif
-#  endif
-#endif
-
 /* Features that were introduced in C++14 */
 #if TEST_STD_VER >= 14
 #define TEST_HAS_EXTENDED_CONSTEXPR
@@ -227,6 +183,12 @@
 #if !TEST_HAS_FEATURE(cxx_rtti) && !defined(__cpp_rtti) \
     && !defined(__GXX_RTTI)
 #define TEST_HAS_NO_RTTI
+#endif
+
+#if !defined(TEST_HAS_NO_RTTI)
+# define RTTI_ASSERT(X) assert(X)
+#else
+# define RTTI_ASSERT(X)
 #endif
 
 #if !TEST_HAS_FEATURE(cxx_exceptions) && !defined(__cpp_exceptions) \
@@ -288,6 +250,10 @@
 #define LIBCPP_ONLY(...) ((void)0)
 #endif
 
+#if !defined(_LIBCPP_HAS_NO_RANGES)
+#define TEST_SUPPORTS_RANGES
+#endif
+
 #define TEST_IGNORE_NODISCARD (void)
 
 namespace test_macros_detail {
@@ -346,6 +312,24 @@ inline void DoNotOptimize(Tp const& value) {
 #else
 #define TEST_ALWAYS_INLINE
 #define TEST_NOINLINE
+#endif
+
+#ifdef _WIN32
+#define TEST_NOT_WIN32(...) ((void)0)
+#else
+#define TEST_NOT_WIN32(...) __VA_ARGS__
+#endif
+
+#if defined(_WIN32) && !defined(_LIBCPP_DISABLE_VISIBILITY_ANNOTATIONS)
+#define TEST_NOT_WIN32_DLL(...) ((void)0)
+#define TEST_ONLY_WIN32_DLL(...) __VA_ARGS__
+#else
+#define TEST_NOT_WIN32_DLL(...) __VA_ARGS__
+#define TEST_ONLY_WIN32_DLL(...) ((void)0)
+#endif
+
+#ifdef _WIN32
+#define TEST_WIN_NO_FILESYSTEM_PERMS_NONE
 #endif
 
 #if defined(__GNUC__)

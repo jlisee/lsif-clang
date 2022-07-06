@@ -7,7 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// UNSUPPORTED: c++98, c++03, c++11, c++14
+// UNSUPPORTED: c++03, c++11, c++14
 
 #include "support/pstl_test_config.h"
 
@@ -37,7 +37,7 @@ class MyClass
     int32_t my_field;
     MyClass() { my_field = 0; }
     MyClass(int32_t in) { my_field = in; }
-    MyClass(const MyClass& in) { my_field = in.my_field; }
+    MyClass(const MyClass& in) = default;
 
     friend MyClass
     operator+(const MyClass& x, const MyClass& y)

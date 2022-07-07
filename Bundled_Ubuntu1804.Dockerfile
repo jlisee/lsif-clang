@@ -26,14 +26,14 @@ RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key \
       | gpg --dearmor - \
       | tee /etc/apt/trusted.gpg.d/kitware.gpg \
       > /dev/null && \
-    echo "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-11 main" \
+    echo "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-13 main" \
       | tee -a /etc/apt/sources.list && \
     echo "deb https://apt.kitware.com/ubuntu/ $(lsb_release -cs) main" \
       | tee -a /etc/apt/sources.list && \
     apt-get update
 
 # Install the tool chain
-RUN apt install -y llvm-11 clang-11 libclang-11-dev cmake libdwarf-dev libelf-dev
+RUN apt install -y llvm-13 clang-13 libclang-13-dev cmake libdwarf-dev libelf-dev
 
 # Do the build
 WORKDIR /lsif-clang
@@ -41,7 +41,7 @@ WORKDIR /lsif-clang
 COPY . .
 
 RUN cd /lsif-clang && \
-    CC=clang-11 CXX=clang-11 cmake -B build && \
+    CC=clang-13 CXX=clang-13 cmake -B build && \
     make -C /lsif-clang/build -j$(nproc) && \
     clang-tools-extra/lsif-clang/package/copy_needed_dynamic_libs.sh ./bin/lsif-clang ./bin
 
